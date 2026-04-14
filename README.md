@@ -7,7 +7,7 @@ Sistema web para la gestión integral de visitantes en la biblioteca. Permite re
 
 - **Dashboard** con KPIs en tiempo real y gráficos de visitas por tipo de visitante.
 - **Registro de visitas** mediante un wizard de 4 pasos con búsqueda de cédula en tiempo real.
-- **Validación de cédula** (7-8 dígitos) y control de visitas activas (no permite múltiples visitas simultáneas).
+- **Validación de cédula** y control de visitas activas.
 - **Historial de visitas** con filtros avanzados (fecha, propósito, estado, cédula) y registro de salida.
 - **Gestión de visitantes** con tarjetas informativas, indicador de visitante frecuente y eliminación segura.
 - **Reportes gráficos** (radar, barras, flujo horario) usando Chart.js.
