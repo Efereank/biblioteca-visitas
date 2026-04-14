@@ -39,7 +39,7 @@ Sistema web para la gestión integral de visitantes en la biblioteca. Permite re
 
 **4. Configurar el archivo de entorno:** Copia el archivo `.env.example` y renómbralo como `.env` con `cp .env.example .env`. Luego edita el archivo `.env` con los datos de tu base de datos: `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=tu_bd`, `DB_USERNAME=tu_usuario`, `DB_PASSWORD=tu_contraseña`.
 
-**5. Generar la clave de la aplicación(Solo si no se crea):** `php artisan key:generate`
+**5. Generar la clave de la aplicación:** `php artisan key:generate`
 
 **6. Ejecutar migraciones y seeders:** `php artisan migrate --seed`. Esto creará todas las tablas y poblará los datos iniciales (tipos de visitante, propósitos, actividades).
 
