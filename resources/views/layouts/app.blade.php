@@ -15,26 +15,14 @@
 </head>
 <body class="bg-gray-50 antialiased">
     <div class="min-h-screen flex flex-col">
-        {{--  Banner --}}
-        <header class="relative h-48 md:h-64 bg-cover bg-center" style="background-image: url('{{ asset('images/biblioteca.jpg') }}')">
-            <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-            <div class="relative container mx-auto px-4 h-full flex flex-col justify-center">
-                <h1 class="text-white text-3xl md:text-5xl font-bold drop-shadow-lg">Biblioteca Pública del Zulia</h1>
-                <p class="text-white text-lg md:text-xl mt-1 md:mt-2 drop-shadow">"María Calcaño"</p>
-            </div>
-        </header>
+        {{-- Banner --}}
 
-        {{-- Navegación responsive con menú hamburguesa --}}
+        {{-- Navegación --}}
         <nav x-data="{ mobileOpen: false }" class="bg-white shadow-md sticky top-0 z-40">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-between h-16">
-                    {{-- Logo --}}
-                    <div class="flex-shrink-0 md:hidden">
-                        <span class="text-gray-800 font-semibold">Menú</span>
-                    </div>
-
                     {{-- Menú desktop --}}
-                    <div class="hidden md:flex md:space-x-8">
+                    <div class="hidden md:flex md:space-x-4">
                         <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
                             Dashboard
                         </a>
@@ -52,7 +40,39 @@
                         </a>
                     </div>
 
-                    {{-- Botón hamburguesa --}}
+                    {{-- Menú de usuario (estilo Breeze) --}}
+                    <div class="hidden md:flex items-center">
+                        <x-dropdown align="right" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                    <div>{{ Auth::user()->name }}</div>
+                                    <div class="ml-1">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('profile.edit')">
+                                    {{ __('Mi Perfil') }}
+                                </x-dropdown-link>
+
+                                <!-- Authentication -->
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <x-dropdown-link :href="route('logout')"
+                                            onclick="event.preventDefault();
+                                                        this.closest('form').submit();">
+                                        {{ __('Cerrar Sesión') }}
+                                    </x-dropdown-link>
+                                </form>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+
+                    {{-- Botón hamburguesa móvil --}}
                     <div class="md:hidden">
                         <button @click="mobileOpen = !mobileOpen" class="text-gray-700 hover:text-blue-600 focus:outline-none">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,23 +83,22 @@
                     </div>
                 </div>
 
-                {{-- Menú móvil desplegable --}}
+                {{-- Menú móvil --}}
                 <div x-show="mobileOpen" x-cloak class="md:hidden pb-4 space-y-2" @click.away="mobileOpen = false">
-                    <a href="{{ route('dashboard') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('dashboard') ? 'text-blue-600 bg-blue-50' : '' }}">
-                        Dashboard
-                    </a>
-                    <a href="{{ route('visitas.create') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('visitas.create') ? 'text-blue-600 bg-blue-50' : '' }}">
-                        Registro Visita
-                    </a>
-                    <a href="{{ route('visitas.historial') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('visitas.historial') ? 'text-blue-600 bg-blue-50' : '' }}">
-                        Historial
-                    </a>
-                    <a href="{{ route('visitantes.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('visitantes.index') ? 'text-blue-600 bg-blue-50' : '' }}">
-                        Visitantes
-                    </a>
-                    <a href="{{ route('reportes') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('reportes') ? 'text-blue-600 bg-blue-50' : '' }}">
-                        Reportes
-                    </a>
+                    <a href="{{ route('dashboard') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    <a href="{{ route('visitas.create') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Registro Visita</a>
+                    <a href="{{ route('visitas.historial') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Historial</a>
+                    <a href="{{ route('visitantes.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Visitantes</a>
+                    <a href="{{ route('reportes') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Reportes</a>
+                    <hr class="my-2">
+                    <div class="px-3 py-2 text-sm text-gray-500">{{ Auth::user()->name }}</div>
+                    <a href="{{ route('profile.edit') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Perfil</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="block w-full text-left text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
+                            Cerrar sesión
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
