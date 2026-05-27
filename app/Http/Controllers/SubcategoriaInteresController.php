@@ -37,7 +37,6 @@ public function store(Request $request)
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    // Validar que no exista duplicado
     $existe = SubcategoriaInteres::where('nombre', $request->nombre)
         ->where('perfil_interes_id', $request->perfil_interes_id)
         ->exists();
@@ -63,7 +62,6 @@ public function update(Request $request, $id)
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    // Validar que no exista duplicado (excluyendo el registro actual)
     $existe = SubcategoriaInteres::where('nombre', $request->nombre)
         ->where('perfil_interes_id', $request->perfil_interes_id)
         ->where('id', '!=', $id)

@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-    {{-- Filtros colapsable --}}
     <div x-data="{ open: {{ request()->hasAny(['fecha_inicio', 'fecha_fin', 'proposito', 'estado', 'cedula']) ? 'true' : 'false' }} }" class="border-b">
         <button @click="open = !open" class="w-full px-4 md:px-6 py-3 md:py-4 text-left font-semibold flex justify-between items-center hover:bg-gray-50 transition">
             <span class="text-gray-800 text-sm md:text-base">
@@ -172,7 +171,6 @@
         </div>
     </div>
 
-    {{-- PAGINACIÓN (MANTENER ESTA LÍNEA) --}}
     <div class="px-4 md:px-6 py-4 border-t">
         {{ $visitas->withQueryString()->links() }}
     </div>
@@ -222,7 +220,6 @@ async function confirmarSalida(id, nombre) {
     }
 }
 
-    // Mostrar mensaje de éxito o error si viene en la URL
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const mensaje = urlParams.get('mensaje');

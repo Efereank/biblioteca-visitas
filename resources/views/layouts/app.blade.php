@@ -6,7 +6,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Biblioteca Pública del Zulia "María Calcaño"</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.jpeg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -24,7 +23,6 @@
         <nav x-data="{ mobileOpen: false }" class="bg-white shadow-md sticky top-0 z-40">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-between h-16">
-                    {{-- Logo y menú desktop --}}
                     <div class="flex items-center gap-6">
                         {{-- Logo --}}
                         <a href="/" class="flex-shrink-0">

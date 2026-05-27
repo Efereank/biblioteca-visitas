@@ -23,7 +23,6 @@ class ReporteController extends Controller
         $fechaInicioObj = Carbon::parse($fechaInicio);
         $fechaFinObj = Carbon::parse($fechaFin)->endOfDay();
 
-        // Salas más visitadas
         $salas = Sala::withCount(['visitas' => function($q) use ($fechaInicioObj, $fechaFinObj) {
             $q->whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj]);
         }])->get();
@@ -31,7 +30,6 @@ class ReporteController extends Controller
         $salasLabels = $salas->pluck('nombre')->toArray();
         $salasData = $salas->pluck('visitas_count')->toArray();
 
-        // Flujo horario
         $flujoHorario = array_fill(0, 24, 0);
         $horasLabels = [];
         for ($i = 0; $i < 24; $i++) {
@@ -48,7 +46,6 @@ class ReporteController extends Controller
             $flujoHorario[intval($hora)] = $visitas->count();
         }
 
-        // Días de la semana
         $diasLabels = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         $diasData = array_fill(0, 7, 0);
 
@@ -90,14 +87,11 @@ public function exportarPDF(Request $request)
     $fechaInicioObj = Carbon::parse($fechaInicio)->startOfDay();
     $fechaFinObj = Carbon::parse($fechaFin)->endOfDay();
 
-    // Total de visitas
     $totalVisitas = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])->count();
 
-    // Promedio diario
     $dias = $fechaInicioObj->diffInDays($fechaFinObj) + 1;
     $promedioDiario = $dias > 0 ? round($totalVisitas / $dias, 1) : 0;
 
-    // Resúmenes
     $salas = Sala::withCount(['visitas' => function ($q) use ($fechaInicioObj, $fechaFinObj) {
         $q->whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj]);
     }])->orderBy('nombre')->get();
@@ -116,36 +110,29 @@ public function exportarPDF(Request $request)
         $q->whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj]);
     }])->orderByDesc('visitas_count')->get();
 
-    // --- NUEVAS ESTADÍSTICAS ---
 
-    // Día más concurrido
     $diaPico = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->select(DB::raw('DATE(fecha_hora_entrada) as fecha'), DB::raw('COUNT(*) as total'))
         ->groupBy('fecha')
         ->orderByDesc('total')
         ->first();
 
-    // Hora pico
     $horaPico = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->select(DB::raw('HOUR(fecha_hora_entrada) as hora'), DB::raw('COUNT(*) as total'))
         ->groupBy('hora')
         ->orderByDesc('total')
         ->first();
-
-    // Duración promedio de visita (minutos)
     $duracionPromedio = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->whereNotNull('fecha_hora_salida')
         ->select(DB::raw('AVG(TIMESTAMPDIFF(MINUTE, fecha_hora_entrada, fecha_hora_salida)) as promedio'))
         ->first()->promedio ?? 0;
 
-    // Horas totales de uso (suma de todas las duraciones)
     $minutosTotales = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->whereNotNull('fecha_hora_salida')
         ->select(DB::raw('SUM(TIMESTAMPDIFF(MINUTE, fecha_hora_entrada, fecha_hora_salida)) as total'))
         ->first()->total ?? 0;
     $horasTotales = round($minutosTotales / 60, 1);
 
-    // Nuevos vs recurrentes (basado en visitas)
     $nuevosVisitas = Visita::whereBetween('visitas.fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->join('visitantes', 'visitas.visitante_id', '=', 'visitantes.id')
         ->where('visitantes.fecha_registro', '>=', $fechaInicioObj)
@@ -155,7 +142,6 @@ public function exportarPDF(Request $request)
     $pctNuevos = $totalVisitas > 0 ? round(($nuevosVisitas / $totalVisitas) * 100) : 0;
     $pctRecurrentes = 100 - $pctNuevos;
 
-    // Distribución por género (visitas)
     $visitasPorGenero = Visita::whereBetween('visitas.fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->join('visitantes', 'visitas.visitante_id', '=', 'visitantes.id')
         ->select('visitantes.genero', DB::raw('COUNT(*) as total'))
@@ -166,7 +152,6 @@ public function exportarPDF(Request $request)
             return $item;
         });
 
-    // Distribución por grupo etario (visitas)
     $visitasPorEdad = Visita::whereBetween('visitas.fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->join('visitantes', 'visitas.visitante_id', '=', 'visitantes.id')
         ->select(DB::raw("
@@ -181,7 +166,6 @@ public function exportarPDF(Request $request)
         ->groupBy('grupo_etario')
         ->get();
 
-    // Top 5 días con más visitas
     $topDias = Visita::whereBetween('fecha_hora_entrada', [$fechaInicioObj, $fechaFinObj])
         ->select(DB::raw('DATE(fecha_hora_entrada) as fecha'), DB::raw('COUNT(*) as total'))
         ->groupBy('fecha')

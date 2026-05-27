@@ -28,14 +28,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// APIs públicas (sin auth)
+// APIs públicas 
 Route::get('api/visitantes/cedula/{cedula}', [VisitanteController::class, 'searchByCedula'])
     ->name('api.visitantes.cedula');
 
 Route::get('api/visitantes/{visitanteId}/visita-activa', [VisitaController::class, 'verificarVisitaActiva'])
     ->name('api.visitantes.visita-activa');
 
-// QR de visitante (accesible por todos los roles)
+// QR de visitante
 Route::get('visitantes/{visitante}/qr', [VisitanteController::class, 'generarQR'])
     ->middleware(['auth'])
     ->name('visitantes.qr');
@@ -94,7 +94,6 @@ Route::get('api/municipios', function() {
     return \App\Models\Municipio::all();
 });
 
-// Imagen PNG para mostrar en <img>
 Route::get('visitantes/{visitante}/qr', [VisitanteController::class, 'generarQR'])->name('visitantes.qr');
 // Vista con ticket imprimible
 Route::get('visitantes/{visitante}/ticket', [VisitanteController::class, 'verQR'])->name('visitantes.ticket');

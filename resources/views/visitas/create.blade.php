@@ -108,7 +108,6 @@
                 <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos del Representante</h3>
                 <p class="text-sm text-gray-600 mb-4">Seleccione el parentesco y complete los datos del adulto responsable.</p>
 
-                {{-- Selector de parentesco --}}
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Parentesco del representante <span class="text-red-500">*</span></label>
                     <select x-model="form.representante_parentesco" @change="onParentescoChange" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">

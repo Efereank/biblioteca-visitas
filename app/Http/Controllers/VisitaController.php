@@ -21,7 +21,6 @@ class VisitaController extends Controller
         $propositos = PropositoVisita::all();
         $actividades = Actividad::all();
 
-        // Salas según rol
         $user = Auth::user();
         if ($user && method_exists($user, 'isBibliotecario') && $user->isBibliotecario()) {
             $salas = $user->salas;
@@ -29,10 +28,8 @@ class VisitaController extends Controller
             $salas = Sala::all();
         }
 
-        // Intereses para paso 3
         $perfiles = PerfilInteres::with('subcategorias')->get();
 
-        // Precargar cédula
         $cedulaPrecargada = $request->query('cedula');
         $visitantePrecargado = null;
 
@@ -71,13 +68,11 @@ class VisitaController extends Controller
         ));
     }
 
-    // Procesa el registro completo de visita
     public function store(Request $request)
     {
         $user = Auth::user();
         $isBibliotecario = $user && method_exists($user, 'isBibliotecario') && $user->isBibliotecario();
 
-        // Si es bibliotecario y no envió sala, asignar la primera que tiene
         if ($isBibliotecario && empty($request->sala_id)) {
             $salas = $user->salas;
             if ($salas->isNotEmpty()) {
@@ -102,7 +97,6 @@ class VisitaController extends Controller
         if ($request->has('visitante_nuevo')) {
             $visitanteData = $request->visitante_nuevo;
 
-            // Validar cédula solo si se envió una (no es menor sin identificación)
             if (!empty($visitanteData['cedula'])) {
                 $cedulaExistente = Visitante::where('cedula', $visitanteData['cedula'])->first();
                 if ($cedulaExistente) {
@@ -111,7 +105,6 @@ class VisitaController extends Controller
                     ], 422);
                 }
             } else {
-                // Si no hay cédula, generar código temporal
                 $visitanteData['cedula'] = null;
             }
 
@@ -120,7 +113,6 @@ class VisitaController extends Controller
                 $visitanteData['docente_id'] = null;
             }
 
-            // Limpiar campos de representante si no aplican
             if ($visitanteData['tipo_documento'] !== 'Sin Identificación') {
                 $visitanteData['representante_nombre'] = null;
                 $visitanteData['representante_cedula'] = null;
@@ -131,7 +123,6 @@ class VisitaController extends Controller
             $visitanteData['fecha_registro'] = now();
             $visitanteData['usuario_registrador_id'] = $user->id;
 
-            // Generar código temporal si la cédula es null
             if (empty($visitanteData['cedula'])) {
                 $visitanteData['cedula'] = Visitante::generarCodigoTemporal(
                     $visitanteData['nombres'],
@@ -145,7 +136,6 @@ class VisitaController extends Controller
             $visitanteId = $request->visitante_id;
 
             if ($isBibliotecario) {
-                // El bibliotecario NECESITA que exista una visita general activa (sin sala)
                 $visitaGeneralActiva = Visita::where('visitante_id', $visitanteId)
                     ->whereNull('sala_id')
                     ->whereNull('fecha_hora_salida')
@@ -157,7 +147,6 @@ class VisitaController extends Controller
                     ], 422);
                 }
 
-                // Verificar que no tenga ya una visita activa en ESTA MISMA sala
                 if ($request->filled('sala_id')) {
                     $visitaEnSala = Visita::where('visitante_id', $visitanteId)
                         ->whereNull('fecha_hora_salida')
@@ -171,7 +160,6 @@ class VisitaController extends Controller
                     }
                 }
             } else {
-                // Recepcionista o admin: bloquear con cualquier visita activa
                 $visitaActiva = Visita::where('visitante_id', $visitanteId)
                     ->whereNull('fecha_hora_salida')
                     ->first();
@@ -183,7 +171,6 @@ class VisitaController extends Controller
                 }
             }
 
-            // Actualizar intereses si se enviaron
             if ($request->has('visitante_intereses')) {
                 $visitante = Visitante::find($visitanteId);
                 $visitante->perfil_interes = $request->input('visitante_intereses.perfil_interes');
@@ -192,7 +179,6 @@ class VisitaController extends Controller
             }
         }
 
-        // --- Creación de la visita principal ---
         $visita = Visita::create([
             'visitante_id' => $visitanteId,
             'proposito_id' => $request->proposito_id,
@@ -202,11 +188,9 @@ class VisitaController extends Controller
             'actividades_ids' => $request->actividades_ids,
         ]);
 
-        // --- REGISTRO AUTOMÁTICO DE MENORES A CARGO (solo bibliotecario en sala) ---
         if ($isBibliotecario && $request->filled('sala_id') && $visitanteId) {
             $representante = Visitante::find($visitanteId);
             if ($representante) {
-                // Buscar menores por docente_id y por representante_cedula
                 $menores = Visitante::where(function ($query) use ($representante) {
                         $query->where('docente_id', $representante->id);
                         if (!empty($representante->cedula)) {
@@ -251,7 +235,6 @@ class VisitaController extends Controller
         ], 201);
     }
 
-    // Registrar salida
     public function registrarSalida($id)
     {
         $user = Auth::user();
@@ -269,12 +252,9 @@ class VisitaController extends Controller
         $visitante = $visita->visitante;
         $menoresCerrados = 0;
 
-        // Determinar si el usuario actual puede cerrar todas las visitas del visitante
-        // (recepcionista o admin cierran todo; bibliotecario solo la visita concreta)
         $cerrarTodas = ($user->role === 'recepcionista' || $user->role === 'admin');
 
         if ($cerrarTodas && $visitante) {
-            // Cerrar todas las visitas activas restantes del mismo visitante (sin contar la actual)
             Visita::where('visitante_id', $visitante->id)
                 ->whereNull('fecha_hora_salida')
                 ->where('id', '!=', $visita->id)

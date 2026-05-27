@@ -4,7 +4,6 @@
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {{-- Tarjeta QR para escanear --}}
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="h-2" style="background-color: {{ $visitante->tipoVisitante->color ?? '#2563eb' }}"></div>
             <div class="p-6 text-center">

@@ -93,7 +93,6 @@
                     <p class="text-center text-gray-500">Cargando detalles...</p>
                 </div>
 
-                {{-- ========== VISTA DETALLE (CORREGIDA) ========== --}}
                 <div x-show="!cargandoDetalle && visitanteSeleccionado !== null && !modoEdicion" x-cloak>
                     <div class="px-6 pt-6 pb-4">
                         <div class="flex items-center justify-between mb-4 pr-8">
@@ -161,7 +160,6 @@
                             </div>
                         </div>
                     </div>
-                    {{-- Botones del modal - CORREGIDO PARA RESPONSIVE --}}
                     <div class="bg-gray-50 px-6 py-4 rounded-b-xl">
                         <div class="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
                             <button @click="eliminarVisitante(visitanteSeleccionado?.id)" class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2">

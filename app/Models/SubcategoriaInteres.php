@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubcategoriaInteres extends Model
 {
-    protected $table = 'subcategorias_interes';  // ← agregar esta línea
+    protected $table = 'subcategorias_interes';
 
     protected $fillable = ['nombre', 'perfil_interes_id'];
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PerfilInteres extends Model
 {
-    protected $table = 'perfiles_interes';  // ← agregar esta línea
+    protected $table = 'perfiles_interes';  
 
     protected $fillable = ['nombre'];
 

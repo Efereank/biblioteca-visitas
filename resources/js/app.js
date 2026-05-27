@@ -832,7 +832,6 @@ window.visitantesManager = function() {
         formEdicion: {},
 
         async init() {
-            // Cargar municipios para los selects de edición
             try {
                 const res = await fetch('/api/municipios');
                 this.municipios = await res.json();
@@ -914,7 +913,6 @@ window.visitantesManager = function() {
                 tipo_visitante_id: this.visitanteSeleccionado.tipo_visitante_id || '',
             };
 
-            // Cargar parroquias y ciudades si hay municipio seleccionado
             if (this.formEdicion.municipio) {
                 this.cargarUbicacionEdicion(this.formEdicion.municipio);
             }
@@ -1373,7 +1371,6 @@ window.crudManager = function(baseUrl, ...fields) {
 // ============================================
 Alpine.start();
 
-// Exportar funciones helper para uso global
 window.showSuccess = showSuccess;
 window.showError = showError;
 window.showWarning = showWarning;

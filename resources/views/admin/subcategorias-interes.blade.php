@@ -79,14 +79,13 @@
     function subcategoriaManager(perfilIdInicial) {
         return {
             perfilId: perfilIdInicial || '',
-            subcategorias: @json($subcategorias), // datos iniciales desde Blade
+            subcategorias: @json($subcategorias),
             modalOpen: false,
             editing: false,
             itemId: null,
             form: { nombre: '', perfil_interes_id: '' },
 
             async init() {
-                // Si hay datos iniciales, no es necesario cargar de nuevo
                 if (this.subcategorias.length === 0) {
                     await this.cargarSubcategorias();
                 }

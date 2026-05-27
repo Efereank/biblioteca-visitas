@@ -44,7 +44,6 @@ class Visita extends Model
     }
 
 
-    //  cuando se crea una visita, incrementar el contador del visitante
     protected static function booted()
     {
         static::created(function ($visita) {

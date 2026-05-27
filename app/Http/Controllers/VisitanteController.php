@@ -38,7 +38,6 @@ class VisitanteController extends Controller
 
         $cedulaLimpia = preg_replace('/[^0-9]/', '', $cedula);
 
-        // Si después de limpiar queda vacío, devolver 404
         if (empty($cedulaLimpia)) {
             return response()->json(['message' => 'Visitante no encontrado'], 404);
         }
@@ -88,17 +87,14 @@ class VisitanteController extends Controller
             'cedula' => [
                 function ($attribute, $value, $fail) use ($request) {
                     $tipo = $request->tipo_documento;
-                    // Si es C.I. o Pasaporte, la cédula es obligatoria
                     if (in_array($tipo, ['C.I.', 'Pasaporte']) && empty($value)) {
                         $fail('El número de documento es obligatorio para ' . $tipo . '.');
                     }
-                    // Si es Partida de Nacimiento o Sin Identificación, puede ir vacío
                     if (!empty($value)) {
                         $cedulaLimpia = preg_replace('/[^0-9]/', '', $value);
                         if (strlen($cedulaLimpia) < 7) {
                             $fail('El número de documento debe tener mínimo 7 dígitos.');
                         }
-                        // Verificar unicidad solo si se proporciona un valor
                         $exists = Visitante::where('cedula', $cedulaLimpia)->exists();
                         if ($exists) {
                             $fail('Este número de documento ya está registrado.');
@@ -106,11 +102,9 @@ class VisitanteController extends Controller
                     }
                 },
             ],
-            // Representante: obligatorio si el visitante es menor sin identificación
             'representante_nombre' => 'required_if:tipo_documento,Sin Identificación|nullable|string|max:100',
             'representante_cedula' => 'required_if:tipo_documento,Sin Identificación|nullable|string|max:20',
             'representante_parentesco' => 'required_if:tipo_documento,Sin Identificación|nullable|in:Padre,Madre,Tutor,Docente,Otro|max:50',
-            // Docente ID: opcional, pero si viene debe existir
             'docente_id' => 'nullable|exists:visitantes,id',
             'nombres' => 'required|string|max:100',
             'apellidos' => 'required|string|max:100',
@@ -154,7 +148,6 @@ class VisitanteController extends Controller
 
         $data = $request->all();
 
-        // Generar código temporal si no se envió cédula
         if (empty($data['cedula'])) {
             $data['cedula'] = Visitante::generarCodigoTemporal(
                 $request->nombres,

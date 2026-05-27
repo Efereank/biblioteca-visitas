@@ -150,7 +150,6 @@
 
 
 
-    <!-- Top 5 días -->
     @if(isset($topDias) && $topDias->isNotEmpty())
     <div class="section-title">Ranking de fechas con mayor demanda</div>
     <table class="data-table">
@@ -178,7 +177,6 @@
     </table>
     @endif
 
-    <!-- Índice de fidelización -->
     <div class="section-title">Índice de fidelización de usuarios</div>
     <table class="data-table">
         <thead>
@@ -202,7 +200,6 @@
         </tbody>
     </table>
 
-    <!-- Segmentación por género -->
     <div class="section-title">Segmentación por género</div>
     <table class="data-table">
         <thead>
@@ -224,7 +221,6 @@
         </tbody>
     </table>
 
-    <!-- Segmentación por rango etario -->
     <div class="section-title">Segmentación por rango etario</div>
     <table class="data-table">
         <thead>
@@ -245,7 +241,6 @@
         </tbody>
     </table>
 
-    <!-- Unidad de servicio (Sala) -->
     <div class="section-title">Distribución por unidad de servicio</div>
     <table class="data-table">
         <thead>
@@ -287,7 +282,6 @@
         </tbody>
     </table>
 
-    <!-- Motivo de consulta -->
     <div class="section-title">Distribución por motivo de consulta</div>
     <table class="data-table">
         <thead>

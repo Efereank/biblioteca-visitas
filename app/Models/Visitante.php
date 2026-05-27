@@ -44,13 +44,11 @@ class Visitante extends Model
 
         public function setCedulaAttribute($value)
         {
-            // Si es null o string vacío, guardar null (para menores sin identificación)
             if (is_null($value) || $value === '') {
                 $this->attributes['cedula'] = null;
                 return;
             }
 
-            // Eliminar cualquier caracter que no sea número
             $cedulaLimpia = preg_replace('/[^0-9]/', '', $value);
             $this->attributes['cedula'] = $cedulaLimpia ?: null;
         }
@@ -99,7 +97,6 @@ public function docente()
     return $this->belongsTo(Visitante::class, 'docente_id');
 }
 
-// Menores asociados a este visitante (si es docente)
 public function menoresACargo()
 {
     return $this->hasMany(Visitante::class, 'docente_id');
