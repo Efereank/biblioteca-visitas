@@ -15,7 +15,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
         </button>
-        <div x-show="open" x-collapse class="px-4 md:px-6 py-4 bg-gray-50">
+        <div x-show="open" x-collapse x-cloak class="px-4 md:px-6 py-4 bg-gray-50">
             <form method="GET" action="{{ route('visitas.historial') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{-- Filtro por Cédula --}}
                 <div>
@@ -125,19 +125,31 @@
                             </span>
                         </td>
                         <td class="px-3 md:px-6 py-4 text-sm font-medium">
-                            @if(!$visita->fecha_hora_salida)
-                                <form action="{{ route('visitas.salida', $visita) }}" method="POST" class="inline" id="form-salida-{{ $visita->id }}">
-                                    @csrf
-                                    <button type="button"
-                                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 md:py-1.5 px-2 md:px-3 rounded-md text-xs transition"
-                                            onclick="confirmarSalida({{ $visita->id }}, '{{ addslashes($visita->visitante->nombre_completo) }}')">
-                                        <span class="hidden sm:inline">Registrar Salida</span>
-                                        <span class="sm:hidden">Salida</span>
-                                    </button>
-                                </form>
-                            @else
-                                <span class="text-gray-400 text-xs">Completado</span>
-                            @endif
+                            <div class="flex items-center gap-2">
+                                {{-- Botón QR (visible en todos los estados) --}}
+                                <a href="{{ route('visitantes.qr', $visita->visitante) }}"
+                                   target="_blank"
+                                   class="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition"
+                                   title="Ver código QR">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2m4 0h-2m-4 0H8m4-4V8m-4 4h8M4 8h4m0 0V4m0 4H4m4 0h4"></path>
+                                    </svg>
+                                </a>
+
+                                @if(!$visita->fecha_hora_salida)
+                                    <form action="{{ route('visitas.salida', $visita) }}" method="POST" class="inline" id="form-salida-{{ $visita->id }}">
+                                        @csrf
+                                        <button type="button"
+                                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 md:py-1.5 px-2 md:px-3 rounded-md text-xs transition"
+                                                onclick="confirmarSalida({{ $visita->id }}, '{{ addslashes($visita->visitante->nombre_completo) }}')">
+                                            <span class="hidden sm:inline">Registrar Salida</span>
+                                            <span class="sm:hidden">Salida</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400 text-xs">Completado</span>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -160,6 +172,7 @@
         </div>
     </div>
 
+    {{-- PAGINACIÓN (MANTENER ESTA LÍNEA) --}}
     <div class="px-4 md:px-6 py-4 border-t">
         {{ $visitas->withQueryString()->links() }}
     </div>
@@ -168,34 +181,46 @@
 
 @push('scripts')
 <script>
-    async function confirmarSalida(id, nombre) {
-        const result = await Swal.fire({
-            title: '¿Registrar salida?',
-            html: `¿Confirma que <strong>${nombre}</strong> está saliendo de la biblioteca?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Sí, registrar salida',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        });
-
-        if (result.isConfirmed) {
-            // Mostrar loading
-            Swal.fire({
-                title: 'Registrando salida...',
-                text: 'Por favor espere',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Enviar formulario
-            document.getElementById(`form-salida-${id}`).submit();
+async function confirmarSalida(id, nombre) {
+    let mensaje = `¿Confirma que <strong>${nombre}</strong> está saliendo de la biblioteca?`;
+    let icono = 'question';
+    try {
+        const res = await fetch(`/api/visitantes/${id}/menores-activos`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.menoresActivos > 0) {
+                mensaje += `<br><br>
+                    <div style="background: #fef3c7; padding: 10px; border-radius: 5px; border: 1px solid #f59e0b;">
+                        ⚠️ <strong>ATENCIÓN:</strong> Esta persona tiene <strong>${data.menoresActivos}</strong> menor(es) a cargo con visita activa.<br>
+                        <small>Al registrar su salida, también se cerrará automáticamente la visita de los menores.</small>
+                    </div>`;
+                icono = 'warning';
+            }
         }
+    } catch (e) {
+        console.error('Error al verificar menores:', e);
     }
+    const result = await Swal.fire({
+        title: '¿Registrar salida?',
+        html: mensaje,
+        icon: icono,
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, registrar salida',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    });
+    if (result.isConfirmed) {
+        Swal.fire({
+            title: 'Registrando salida...',
+            text: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        document.getElementById(`form-salida-${id}`).submit();
+    }
+}
 
     // Mostrar mensaje de éxito o error si viene en la URL
     document.addEventListener('DOMContentLoaded', function() {

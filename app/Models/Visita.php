@@ -10,8 +10,10 @@ class Visita extends Model
     use HasFactory;
 
     protected $table = 'visitas';
+
+    
     protected $fillable = [
-        'visitante_id', 'proposito_id', 'fecha_hora_entrada',
+        'visitante_id', 'proposito_id', 'sala_id', 'fecha_hora_entrada',
         'fecha_hora_salida', 'observaciones', 'actividades_ids'
     ];
 
@@ -35,6 +37,12 @@ class Visita extends Model
     {
         return Actividad::whereIn('id', $this->actividades_ids ?? [])->get();
     }
+
+        public function sala()
+    {
+        return $this->belongsTo(Sala::class);
+    }
+
 
     //  cuando se crea una visita, incrementar el contador del visitante
     protected static function booted()

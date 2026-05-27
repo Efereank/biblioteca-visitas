@@ -43,7 +43,7 @@ class DashboardController extends Controller
         // Últimas visitas para la tabla
         $ultimasVisitas = Visita::with(['visitante', 'proposito'])
                                 ->orderBy('fecha_hora_entrada', 'desc')
-                                ->limit(10)
+                                ->limit(5)
                                 ->get();
 
         return view('dashboard', compact(

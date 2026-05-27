@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role'])] // ← Agregar 'role'
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,5 +28,28 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relación con salas (solo bibliotecarios)
+    public function salas()
+    {
+        return $this->belongsToMany(Sala::class, 'sala_user');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    // Verificar si es bibliotecario
+    public function isBibliotecario()
+    {
+        return $this->role === 'bibliotecario';
+    }
+
+    // Verificar si es recepcionista
+    public function isRecepcionista()
+    {
+        return $this->role === 'recepcionista';
     }
 }

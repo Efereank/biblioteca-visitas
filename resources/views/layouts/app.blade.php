@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Biblioteca Pública del Zulia "María Calcaño"</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.jpeg') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -15,32 +19,76 @@
 </head>
 <body class="bg-gray-50 antialiased">
     <div class="min-h-screen flex flex-col">
-        {{-- Banner --}}
 
         {{-- Navegación --}}
         <nav x-data="{ mobileOpen: false }" class="bg-white shadow-md sticky top-0 z-40">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-between h-16">
-                    {{-- Menú desktop --}}
-                    <div class="hidden md:flex md:space-x-4">
-                        <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
-                            Dashboard
+                    {{-- Logo y menú desktop --}}
+                    <div class="flex items-center gap-6">
+                        {{-- Logo --}}
+                        <a href="/" class="flex-shrink-0">
+                            <img src="{{ asset('img/logo2.png') }}" alt="Logo" class="h-10 w-auto">
                         </a>
-                        <a href="{{ route('visitas.create') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitas.create') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
-                            Registro Visita
-                        </a>
-                        <a href="{{ route('visitas.historial') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitas.historial') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
-                            Historial
-                        </a>
-                        <a href="{{ route('visitantes.index') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitantes.index') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
-                            Visitantes
-                        </a>
-                        <a href="{{ route('reportes') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('reportes') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
-                            Reportes
-                        </a>
+
+                        {{-- Menú desktop --}}
+                        <div class="hidden md:flex md:space-x-4">
+                            {{-- Dashboard y Reportes solo admin --}}
+                            @if(Auth::user()->isAdmin())
+                            <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                                Dashboard
+                            </a>
+                            @endif
+
+                            <a href="{{ route('visitas.create') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitas.create') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                                Registro Visita
+                            </a>
+                            <a href="{{ route('visitas.historial') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitas.historial') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                                Historial
+                            </a>
+
+                            {{-- Visitantes solo admin y recepcionista --}}
+                            @if(!Auth::user()->isBibliotecario())
+                            <a href="{{ route('visitantes.index') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('visitantes.index') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                                Visitantes
+                            </a>
+                            @endif
+
+                            {{-- Reportes solo admin --}}
+                            @if(Auth::user()->isAdmin())
+                            <a href="{{ route('reportes') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('reportes') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                                Reportes
+                            </a>
+                            @endif
+
+                            {{-- Menú Administración solo admin --}}
+                            @if(Auth::user()->isAdmin())
+                            <div x-data="{ open: false }" class="relative">
+                                <button @click="open = !open" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
+                                    Administración
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                    <div x-show="open" x-cloak @click.away="open = false" class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border">
+                                    <a href="{{ route('tipos-visitante.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('tipos-visitante.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Tipos de Visitante</a>
+                                    <a href="{{ route('propositos-visita.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('propositos-visita.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Propósitos de Visita</a>
+                                    <a href="{{ route('actividades.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('actividades.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Actividades</a>
+                                    <a href="{{ route('salas.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('salas.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Salas</a>
+                                    <a href="{{ route('perfiles-interes.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('perfiles-interes.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Perfiles de Interés</a>
+                                    <a href="{{ route('subcategorias-interes.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('subcategorias-interes.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Subcategorías</a>
+                                    <a href="{{ route('users.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-600' : '' }}"> Usuarios</a>
+
+                                    <a href="{{ route('municipios.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('municipios.*') ? 'bg-blue-50 text-blue-600' : '' }}">Municipios</a>
+                                    <a href="{{ route('parroquias.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('parroquias.*') ? 'bg-blue-50 text-blue-600' : '' }}">Parroquias</a>
+                                    <a href="{{ route('ciudades.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ request()->routeIs('ciudades.*') ? 'bg-blue-50 text-blue-600' : '' }}">Ciudades</a>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
                     </div>
 
-                    {{-- Menú de usuario (estilo Breeze) --}}
+                    {{-- Menú de usuario --}}
                     <div class="hidden md:flex items-center">
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
@@ -59,7 +107,6 @@
                                     {{ __('Mi Perfil') }}
                                 </x-dropdown-link>
 
-                                <!-- Authentication -->
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <x-dropdown-link :href="route('logout')"
@@ -85,11 +132,31 @@
 
                 {{-- Menú móvil --}}
                 <div x-show="mobileOpen" x-cloak class="md:hidden pb-4 space-y-2" @click.away="mobileOpen = false">
+                    @if(Auth::user()->isAdmin())
                     <a href="{{ route('dashboard') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    @endif
+
                     <a href="{{ route('visitas.create') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Registro Visita</a>
                     <a href="{{ route('visitas.historial') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Historial</a>
+
+                    @if(!Auth::user()->isBibliotecario())
                     <a href="{{ route('visitantes.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Visitantes</a>
+                    @endif
+
+                    @if(Auth::user()->isAdmin())
                     <a href="{{ route('reportes') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Reportes</a>
+
+                    <hr class="my-2">
+                    <p class="px-3 py-1 text-xs text-gray-500 uppercase">Administración</p>
+                    <a href="{{ route('tipos-visitante.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Tipos de Visitante</a>
+                    <a href="{{ route('propositos-visita.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Propósitos de Visita</a>
+                    <a href="{{ route('actividades.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Actividades</a>
+                    <a href="{{ route('salas.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Salas</a>
+                    <a href="{{ route('perfiles-interes.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Perfiles de Interés</a>
+                    <a href="{{ route('subcategorias-interes.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Subcategorías</a>
+                    <a href="{{ route('users.index') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"> Usuarios</a>
+                    @endif
+
                     <hr class="my-2">
                     <div class="px-3 py-2 text-sm text-gray-500">{{ Auth::user()->name }}</div>
                     <a href="{{ route('profile.edit') }}" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Perfil</a>

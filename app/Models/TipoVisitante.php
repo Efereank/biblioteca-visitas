@@ -16,4 +16,9 @@ class TipoVisitante extends Model
     {
         return $this->hasMany(Visitante::class);
     }
+
+    public function visitas()
+    {
+        return $this->hasManyThrough(Visita::class, Visitante::class, 'tipo_visitante_id', 'visitante_id');
+    }
 }
