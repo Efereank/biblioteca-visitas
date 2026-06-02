@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Biblioteca Pública "Maria Calcaño"') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
                 <div>
                     <a href="/">
-                        <img src="{{ asset('img/logo.png') }}" alt="Logo" class="w-56 h-56 object-contain">
+                        <img src="{{ asset('img/logo.png') }}" alt="Logo" class="w-40 h-40 object-contain">
                     </a>
                 </div>
 
