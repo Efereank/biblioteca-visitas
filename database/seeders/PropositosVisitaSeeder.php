@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\PropositoVisita;
+use Illuminate\Database\Seeder;
 
 class PropositosVisitaSeeder extends Seeder
 {
     public function run(): void
     {
-        PropositoVisita::insert([
+        $propositos = [
             ['nombre' => 'Consulta en sala', 'color' => '#0EA5E9'],
             ['nombre' => 'Préstamo a domicilio', 'color' => '#6366F1'],
             ['nombre' => 'Devolución', 'color' => '#14B8A6'],
@@ -17,6 +17,13 @@ class PropositosVisitaSeeder extends Seeder
             ['nombre' => 'Estudio', 'color' => '#8B5CF6'],
             ['nombre' => 'Investigación', 'color' => '#10B981'],
             ['nombre' => 'Otro', 'color' => '#141412'],
-        ]);
+        ];
+
+        foreach ($propositos as $proposito) {
+            PropositoVisita::updateOrCreate(
+                ['nombre' => $proposito['nombre']],
+                ['color' => $proposito['color']]
+            );
+        }
     }
 }
