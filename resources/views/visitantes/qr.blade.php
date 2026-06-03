@@ -4,6 +4,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+        {{-- Tarjeta QR para escanear --}}
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="h-2" style="background-color: {{ $visitante->tipoVisitante->color ?? '#2563eb' }}"></div>
             <div class="p-6 text-center">
@@ -110,20 +111,10 @@
 @push('scripts')
 <script>
     function imprimirQR() {
-        const elementoQR = document.querySelector('.bg-white.p-4.rounded-xl.border-2.border-dashed');
-        if (!elementoQR) return;
-
-        const qrCard = elementoQR.parentElement.innerHTML;
+        const qrCard = document.querySelector('.bg-white.p-4.rounded-xl.border-2.border-dashed').parentElement.innerHTML;
         const nombre = "{{ $visitante->nombre_completo }}";
 
         const ventana = window.open('', '_blank', 'width=400,height=550');
-
-        // Validación contra bloqueadores de pop-ups
-        if (!ventana) {
-            alert("Por favor, permite las ventanas emergentes para poder imprimir.");
-            return;
-        }
-
         ventana.document.write(`
             <!DOCTYPE html>
             <html>
@@ -134,12 +125,10 @@
                         text-align: center;
                         font-family: 'Segoe UI', sans-serif;
                         padding: 30px;
-                        margin: 0;
                     }
                     h2 { margin-bottom: 5px; }
                     p { color: #666; margin: 5px 0; }
-                    /* Asegura que el SVG herede el tamaño correcto en la impresión */
-                    svg { width: 300px !important; height: 300px !important; display: inline-block; }
+                    svg { width: 300px; height: 300px; }
                     @media print {
                         @page { margin: 0; }
                         body { margin: 0; padding: 20px; }
@@ -153,34 +142,19 @@
                     ${qrCard}
                 </div>
                 <p style="font-size: 12px; color: #999;">Escanee para registrar visita</p>
-
-                <script>
-                    window.addEventListener('DOMContentLoaded', () => {
-                        window.print();
-                        window.onafterprint = () => window.close();
-                    });
-                <\/script>
             </body>
             </html>
         `);
         ventana.document.close();
+
+        setTimeout(() => ventana.print(), 500);
     }
 
     function imprimirTicket() {
-        const elementoTicket = document.getElementById('ticket-termico');
-        if (!elementoTicket) return;
-
-        const ticket = elementoTicket.innerHTML;
+        const ticket = document.getElementById('ticket-termico').innerHTML;
         const nombre = "{{ $visitante->nombre_completo }}";
 
         const ventana = window.open('', '_blank', 'width=350,height=550');
-
-        // Validación contra bloqueadores de pop-ups
-        if (!ventana) {
-            alert("Por favor, permite las ventanas emergentes para poder imprimir el ticket.");
-            return;
-        }
-
         ventana.document.write(`
             <!DOCTYPE html>
             <html>
@@ -194,10 +168,8 @@
                         margin: 0;
                         padding: 15px;
                         background: white;
-                        width: 72mm; /* Ancho seguro para impresoras térmicas de 80mm */
                     }
-                    /* Forzamos el tamaño del SVG del ticket */
-                    svg { width: 180px !important; height: 180px !important; display: inline-block; }
+                    svg { width: 200px; height: 200px; }
                     @media print {
                         @page {
                             size: 80mm auto;
@@ -212,53 +184,34 @@
             </head>
             <body>
                 ${ticket}
-
-                <script>
-                    window.addEventListener('DOMContentLoaded', () => {
-                        window.print();
-                        window.onafterprint = () => window.close();
-                    });
-                <\/script>
             </body>
             </html>
         `);
         ventana.document.close();
+
+        setTimeout(() => ventana.print(), 500);
     }
 </script>
 @endpush
 
 <style>
-    /* Configuración para el navegador / vista previa */
-    body {
-        font-family: 'Courier New', monospace;
-        font-size: 12px; /* Tamaño ideal legible para agujas/térmicas */
-        line-height: 1.2;
-        text-align: center;
-        margin: 0;
-        padding: 0;
-        background: white;
-        width: 72mm; /* El ancho real imprimible de un papel de 80mm */
+    /* Estilos para el QR */
+    .bg-white.p-4.rounded-xl.border-2.border-dashed svg {
+        width: 220px !important;
+        height: 220px !important;
     }
 
-    /* Forzar que los gráficos no desborden el rodillo */
-    svg, img {
-        max-width: 100% !important;
-        height: auto !important;
-        display: inline-block;
+    #ticket-termico svg {
+        width: 180px !important;
+        height: 180px !important;
     }
 
-    /* Ajustes específicos de impresión física */
-    @media print {
-        @page {
-            size: 80mm auto; /* Define el ancho fijo y alto dinámico según contenido */
-            margin: 0mm;    /* Elimina encabezados de página (fecha, url, título) */
-        }
-        body {
-            margin: 0;
-            padding: 0mm 2mm 5mm 2mm; /* Margen superior cero, inferior 5mm para el corte */
-            width: 72mm;
-        }
+    /* Animación sutil al cargar */
+    .bg-white.rounded-xl.shadow-lg {
+        transition: transform 0.2s ease;
+    }
+    .bg-white.rounded-xl.shadow-lg:hover {
+        transform: translateY(-2px);
     }
 </style>
-
 @endsection
