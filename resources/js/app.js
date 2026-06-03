@@ -1079,11 +1079,6 @@ function initDashboardChart() {
     const chartData = window.chartDashboardData;
     if (!chartData) return;
 
-
-    const existingChart = Chart.getChart('chartTiposVisitante');
-if (existingChart) {
-    existingChart.destroy();
-}
     const ctx = chartElement.getContext('2d');
     new Chart(ctx, {
         type: 'bar',
@@ -1122,57 +1117,51 @@ function initReportesCharts() {
         }
     });
 
-// Radar Chart
-const radarElement = document.getElementById('radarChart');
-if (radarElement && reportData.salasLabels) {
-    // Destruir gráfico existente si ya fue creado
-    const existingChart = Chart.getChart('radarChart');
-    if (existingChart) {
-        existingChart.destroy();
-    }
-
-    const ctx = radarElement.getContext('2d');
-    radarElement.chart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: reportData.salasLabels,
-            datasets: [{
-                label: 'Cantidad de visitas',
-                data: reportData.salasData,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                pointBackgroundColor: 'rgb(54, 162, 235)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(54, 162, 235)',
-                borderWidth: 2,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1, backdropColor: 'transparent' },
-                    grid: { color: 'rgba(0, 0, 0, 0.1)' }
-                }
+    // Radar Chart
+    const radarElement = document.getElementById('radarChart');
+    if (radarElement && reportData.salasLabels) {
+        const ctx = radarElement.getContext('2d');
+        radarElement.chart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: reportData.salasLabels,
+                datasets: [{
+                    label: 'Cantidad de visitas',
+                    data: reportData.salasData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 2,
+                    fill: true
+                }]
             },
-            plugins: {
-                tooltip: {
-                    filter: function(tooltipItem) {
-                        return tooltipItem.raw > 0;
-                    },
-                    callbacks: {
-                        label: (ctx) => `${ctx.raw} visitas`
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, backdropColor: 'transparent' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
                     }
                 },
-                legend: { position: 'bottom' }
+                plugins: {
+                    tooltip: {
+                        filter: function(tooltipItem) {
+                            return tooltipItem.raw > 0;
+                        },
+                        callbacks: {
+                            label: (ctx) => `${ctx.raw} visitas`
+                        }
+                    },
+                    legend: { position: 'bottom' }
+                }
             }
-        }
-    });
-}
+        });
+    }
 
     // Flujo Horario Chart
     const flujoElement = document.getElementById('flujoHorarioChart');
@@ -1187,14 +1176,7 @@ if (radarElement && reportData.salasLabels) {
             return 'rgba(59, 130, 246, 0.6)';
         });
 
-
         const ctx = flujoElement.getContext('2d');
-
-
-        const existingChart = Chart.getChart('flujoHorarioChart');
-            if (existingChart) {
-                existingChart.destroy();
-            }
         flujoElement.chart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -1249,11 +1231,6 @@ if (radarElement && reportData.salasLabels) {
         );
 
         const ctx = diasElement.getContext('2d');
-
-        const existingChart = Chart.getChart('diasChart');
-if (existingChart) {
-    existingChart.destroy();
-}
         diasElement.chart = new Chart(ctx, {
             type: 'bar',
             data: {
