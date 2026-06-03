@@ -12,8 +12,8 @@ class DatabaseSeeder extends Seeder
             TiposVisitanteSeeder::class,
             PropositosVisitaSeeder::class,
             ActividadesSeeder::class,
-            AdminUserSeeder::class, 
-
+            AdminUserSeeder::class,
+            ZuliaSeeder::class,
         ]);
     }
 }
