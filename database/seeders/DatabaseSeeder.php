@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             ActividadesSeeder::class,
             AdminUserSeeder::class,
             ZuliaSeeder::class,
+            SalaSeeder::class,
         ]);
     }
 }
