@@ -117,9 +117,9 @@
         const ventana = window.open('', '_blank', 'width=400,height=550');
         ventana.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="es">
             <head>
-                <title>QR - ${nombre}</title>
+                <meta charset="UTF-8"> <title>QR - ${nombre}</title>
                 <style>
                     body {
                         text-align: center;
@@ -128,7 +128,7 @@
                     }
                     h2 { margin-bottom: 5px; }
                     p { color: #666; margin: 5px 0; }
-                    svg { width: 300px; height: 300px; }
+                    svg { width: 300px; height: 300px; display: block; margin: 0 auto; }
                     @media print {
                         @page { margin: 0; }
                         body { margin: 0; padding: 20px; }
@@ -147,7 +147,8 @@
         `);
         ventana.document.close();
 
-        setTimeout(() => ventana.print(), 500);
+        // Aumentamos ligeramente el tiempo para dar margen de renderizado
+        setTimeout(() => ventana.print(), 800);
     }
 
     function imprimirTicket() {
@@ -157,19 +158,32 @@
         const ventana = window.open('', '_blank', 'width=350,height=550');
         ventana.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="es">
             <head>
-                <title>Ticket - ${nombre}</title>
+                <meta charset="UTF-8"> <title>Ticket - ${nombre}</title>
                 <style>
                     body {
                         font-family: 'Courier New', monospace;
                         font-size: 11px;
                         text-align: center;
                         margin: 0;
-                        padding: 15px;
+                        padding: 10px; /* Reducido para evitar cortes */
                         background: white;
+                        color: black;
+                        word-wrap: break-word; /* Evita que el texto largo se corte */
                     }
-                    svg { width: 200px; height: 200px; }
+                    /* Forzamos el renderizado del SVG para la impresora térmica */
+                    svg {
+                        width: 160px !important;
+                        height: 160px !important;
+                        display: block !important;
+                        margin: 0 auto !important;
+                    }
+                    img {
+                        max-width: 160px;
+                        margin: 0 auto;
+                        display: block;
+                    }
                     @media print {
                         @page {
                             size: 80mm auto;
@@ -177,7 +191,7 @@
                         }
                         body {
                             margin: 0;
-                            padding: 5mm;
+                            padding: 2mm; /* Margen mínimo para la térmica */
                         }
                     }
                 </style>
@@ -189,7 +203,7 @@
         `);
         ventana.document.close();
 
-        setTimeout(() => ventana.print(), 500);
+        setTimeout(() => ventana.print(), 800);
     }
 </script>
 @endpush
