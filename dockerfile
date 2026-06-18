@@ -1,38 +1,26 @@
-FROM php:8.3-fpm
+# --- Etapa 1: Construcción ---
+FROM php:8.3-fpm AS builder
 
-# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libzip-dev \
-    default-mysql-client
+    libpng-dev libonig-dev libxml2-dev libzip-dev zip unzip \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Limpiar caché
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# --- Etapa 2: Imagen Final (más ligera) ---
+FROM php:8.3-fpm-alpine
 
-# Instalar extensiones PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Instalar solo las dependencias necesarias en tiempo de ejecución (Alpine es mucho más ligero)
+RUN apk add --no-cache libpng libonig libxml2 libzip
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copiar solo las extensiones compiladas y configuraciones desde la etapa anterior
+COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
+COPY --from=builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
 
-# Configurar directorio de trabajo
 WORKDIR /var/www
 
-# Copiar el proyecto
+# Copiar el código fuente (asegúrate de tener un .dockerignore correcto)
 COPY . .
 
-# Dar permisos
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www
 
-# Exponer puerto
 EXPOSE 9000
-
 CMD ["php-fpm"]
